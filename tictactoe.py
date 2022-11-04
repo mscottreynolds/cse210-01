@@ -24,7 +24,7 @@ Grid
 
 """
 
-# Define table of winning rows that need to be checked for each squre.
+# Define table of rows of winning second and third squares for each position in grid.
 winning_positions = [
     [[1, 2], [3, 6], [4, 8]],           # 0
     [[0, 2], [4, 7]],                   # 1
@@ -37,50 +37,55 @@ winning_positions = [
     [[0, 4], [2, 5], [6, 7]]            # 8
    ]
 
-player_x = "x"
-player_o = "o"
+player_x = "X"
+player_o = "O"
 
 def main():
+    print("""
+Tic-Tac-Toe is a game in which two players seek in alternate turns to complete
+a row, a column, or a diagonal with either three x's or three o's drawn in the
+spaces of a grid of nine squares.
+    """)
+
     # Initialize positions.
     positions = \
         ['1', '2', '3',
          '4', '5', '6',
          '7', '8', '9']
 
-    available_positions = count_available_positions(positions)
     a_winner = None
     current_player = player_x
-    print("Let's play a game of of tic-tac-toe.")
-    print()
+
     display_positions(positions)
-    while available_positions > 0:
+    available_positions = count_available_positions(positions)
+    while available_positions > 0 and not a_winner:
         # Loop until no more avaiable positions
         # or a player has won.
 
-        # go for current_player
+        # Go for current_player
         choice = get_choice(current_player, positions)
         display_positions(positions)
 
+        # Check for win.
         a_winner = check_for_win(choice, positions)
-        if a_winner:
-            print(f"Congratulations, {a_winner} won the game.") 
-            break
-
-        # Change current player
-        if current_player == player_x:
-            current_player = player_o
-        else:
-            current_player = player_x
+        if not a_winner:
+           # Change current player
+            if current_player == player_x:
+                current_player = player_o
+            elif current_player == player_o:
+                current_player = player_x
 
         # Now count available positions left.
         available_positions = count_available_positions(positions)
 
     if not a_winner:
-        print("Tie game.")
+        print("Game is a draw.")
+    else:
+        print(f"Congratulations, {a_winner} won the game.") 
 
 
 def count_available_positions(positions):
-    # return the number of available positions,
+    # Return the number of available positions,
     # not already taken by a player.
     available = 0
     for i in range(9):
@@ -90,31 +95,35 @@ def count_available_positions(positions):
 
 
 def check_for_win(choice, positions):
-    # check for a winner at choice.
+    # Check for a winner at choice.
     # Return the winner if it is a winning position. None otherwise.
 
     square = choice-1
     a_winner = None
     player = positions[square]
 
+    # Check the winning rows for the player at specified square.
     winning_rows = winning_positions[square]
     for row in winning_rows:
+        # If two squares at the current row match the player, then a winner.
         if positions[row[0]] == player and positions[row[1]] == player:
             a_winner = player
             break
+        
     return a_winner
 
 
 def get_choice(player, positions):
-    # Get a valid choice for the player
-    # and return the choice. Note that choice
-    # is based on 1 - 9.
+    # Get a valid choice for the player, set the square
+    # for the player, and return the choice.
+    # Note that choice is based on players input of 1 - 9.
     valid_choice = False
     while not valid_choice:
         choice = int(input(f"{player}'s turn to choose a square (1-9): "))
         if choice >= 1 and choice <= 9:
             square = choice-1
             if positions[square] != player_x and positions[square] != player_o:
+                # Set the square to tghe player and return choice.
                 positions[square] = player
                 valid_choice = True
             else:
